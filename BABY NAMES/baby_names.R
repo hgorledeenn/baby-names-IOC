@@ -2,11 +2,32 @@ library(tidyverse)
 
 df = read_csv("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES/Popular_Baby_Names_20260203.csv")
 
+df <- df %>%
+  mutate(name = str_to_title(`Child's First Name`))
+
+df_no_ethn <- df %>%
+  group_by(`Year of Birth`, Gender, name) %>%
+  summarize(sum_count = sum(Count)) %>%
+  pivot_wider(names_from = Gender, values_from = sum_count, values_fill = 0) %>%
+  mutate(pct_diff = (FEMALE-MALE)/(FEMALE+MALE)) %>%
+  mutate(total_count = (FEMALE+MALE))
+
+
+df_no_ethn_diff_byyear <- df_no_ethn %>%
+  pivot_wider(names_from = `Year of Birth`, values_from = pct_diff) %>%
+  select(-FEMALE, -MALE)
+
+df_no_ethn %>%
+  ggplot() +
+  aes(x=`Year of Birth`, y=pct_diff, group=name, alpha=total_count) +
+  geom_line()
+
+
 df_no_yrs <- df %>%
   mutate(name = str_to_title(`Child's First Name`)) %>%
   group_by(Gender, name) %>%
   summarize(sum_count = sum(Count))
-  
+
 df_wider <- df_no_yrs %>%
   pivot_wider(names_from = Gender, values_from = sum_count, values_fill = 0)
 
