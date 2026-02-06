@@ -12,15 +12,58 @@ df_no_ethn <- df %>%
   mutate(pct_diff = (FEMALE-MALE)/(FEMALE+MALE)) %>%
   mutate(total_count = (FEMALE+MALE))
 
+wide_with_var <- df_no_ethn %>%
+  select(name, `Year of Birth`, pct_diff) %>%
+  pivot_wider(
+    names_from = `Year of Birth`,
+    values_from = pct_diff
+  ) %>%
+  rowwise() %>%
+  mutate(
+    variance = var(c_across(`2011`:`2021`), na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  select(name, variance, `2011`:`2021`)
 
-df_no_ethn_diff_byyear <- df_no_ethn %>%
-  pivot_wider(names_from = `Year of Birth`, values_from = pct_diff) %>%
-  select(-FEMALE, -MALE)
+only_w_variance <- wide_with_var %>%
+  filter(variance>0)
 
-df_no_ethn %>%
+variance_list <- only_w_variance$name
+
+df_with_var <- df_no_ethn %>%
+  filter(name %in% variance_list)
+
+for (i in c(variance_list)):
+  df_with_var %>%
+    ggplot() +
+    aes(x=`Year of Birth`, y=pct_diff, group=name, color=name) +
+    geom_line(color="black", linewidth=0.5) + 
+    geom_line(data = filter(df_with_var, name=="Jamie"), color = "red", linewidth=1)
+
+
+df_with_var %>%
   ggplot() +
-  aes(x=`Year of Birth`, y=pct_diff, group=name, alpha=total_count) +
-  geom_line()
+  aes(x=`Year of Birth`, y=pct_diff, group=name, color=name) +
+  geom_line(color="black", linewidth=0.5) + 
+  geom_line(data = filter(df_with_var, name=="Jamie"), color = "red", linewidth=1)
+
+
+df_wide_for_var <- df_no_ethn %>%
+  pivot_wider(names_from = name, values_from = pct_diff) %>%
+  select(-FEMALE, -MALE, -total_count)
+
+## Create naother df where i calculate variance for each name and filter where 
+## variance is not 0 (or is some value) then save the name column a a list and
+## then filter my original dataframe to only be that list
+
+### I HAve to pivot wide I think? So each column is a name and each row is a year.
+
+## list_of_names <- df$name_column
+
+## then
+
+##.df_other %>%
+##    filter(name==c(list_of_names)) OR SOEMTHING LIKE THAT
 
 
 df_no_yrs <- df %>%
