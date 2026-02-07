@@ -38,14 +38,15 @@ df_with_var <- df_no_ethn %>%
 for (i in variance_list) {
     title <- paste0("All names with variance>0 in the dataset with ", i, " highlighted")
     sum <- sum(df_with_var$total_count[df_with_var$name == i])
-    subtitle <- paste0("The name ", i, " appeared ", sum, " times in the dataset.")
+    var <- sum(wide_with_var$variance[wide_with_var$name == i])
+    subtitle <- paste0("The name ", i, " appeared ", sum, " times in the dataset and had a variance of ", var, ".")
     p <- ggplot(data = df_with_var) +
       aes(x=`Year of Birth`, y=pct_diff, group=name) +
       geom_line(color="black", linewidth=0.5) + 
       geom_line(data = filter(df_with_var, name==i), color = "red", linewidth=1) +
       labs(
         title = title,
-        subtitle = subtitle
+        subtitle = str_wrap(subtitle, 60)
       )
       filename <- paste0("plots/all_dist", i, ".png")
       ggsave(filename, plot=p, width = 6, height = 4, units = "in")
