@@ -1,4 +1,6 @@
 library(tidyverse)
+library(glue)
+setwd("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES")
 
 df = read_csv("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES/Popular_Baby_Names_20260203.csv")
 
@@ -33,12 +35,21 @@ variance_list <- only_w_variance$name
 df_with_var <- df_no_ethn %>%
   filter(name %in% variance_list)
 
-for (i in c(variance_list)):
-  df_with_var %>%
-    ggplot() +
-    aes(x=`Year of Birth`, y=pct_diff, group=name, color=name) +
-    geom_line(color="black", linewidth=0.5) + 
-    geom_line(data = filter(df_with_var, name=="Jamie"), color = "red", linewidth=1)
+for (i in variance_list) {
+    title <- paste0("All names with variance>0 in the dataset with ", i, " highlighted")
+    sum <- sum(df_with_var$total_count[df_with_var$name == i])
+    subtitle <- paste0("The name ", i, " appeared ", sum, " times in the dataset.")
+    p <- ggplot(data = df_with_var) +
+      aes(x=`Year of Birth`, y=pct_diff, group=name) +
+      geom_line(color="black", linewidth=0.5) + 
+      geom_line(data = filter(df_with_var, name==i), color = "red", linewidth=1) +
+      labs(
+        title = title,
+        subtitle = subtitle
+      )
+      filename <- paste0("plots/all_dist", i, ".png")
+      ggsave(filename, plot=p, width = 6, height = 4, units = "in")
+}
 
 
 df_with_var %>%
