@@ -1,6 +1,8 @@
 library(tidyverse)
 library(glue)
+library(ggplot)
 library(ggrepel)
+library(gganimate)
 
 setwd("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES")
 
@@ -16,9 +18,6 @@ df_no_ethn <- df %>%
   mutate(pct_diff = (FEMALE-MALE)/(FEMALE+MALE)) %>%
   mutate(total_count = (FEMALE+MALE))
 
-df_for_calc_total_pctdiff <- df_no_ethn %>%
-  select(name, )
-
 wide_with_var <- df_no_ethn %>%
   select(name, `Year of Birth`, pct_diff) %>%
   pivot_wider(
@@ -30,12 +29,23 @@ wide_with_var <- df_no_ethn %>%
     variance = var(c_across(`2011`:`2021`), na.rm = TRUE)
   ) %>%
   ungroup() %>%
-  select(name, variance, `2011`:`2021`) %>%
-  mutate(sum_pct_diff = sum(`2011`:`2021`))
+  select(name, variance, `2011`:`2021`)
 
-## ^^ Trying to create a column summing the pct_diffs across the years so I can
-## create an animation/animated chart where it goes through each name from top to bottom
-## (like in order of highest total pct_diff to lowest total pct_diff)
+wide_with_var <- wide_with_var %>%
+  mutate(sum_pct_diff = rowSums(wide_with_var[c("2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021")], na.rm=TRUE))
+
+wide_with_var <- wide_with_var %>%
+  filter(name %in% variance_list) %>%
+  arrange(
+    desc(sum_pct_diff),   # highest total_pct_diff first
+    desc(variance),         # break ties by variance
+    name                    # break any remaining ties alphabetically
+  ) %>%
+  mutate(
+    rank = row_number()     # sequential rank
+  )
+
+
 
 only_w_variance <- wide_with_var %>%
   filter(variance>0)
@@ -49,6 +59,9 @@ for (i in variance_list) {
     title <- paste0("All names with variance>0 in the dataset with ", i, " highlighted")
     sum <- sum(df_with_var$total_count[df_with_var$name == i])
     var <- sum(wide_with_var$variance[wide_with_var$name == i])
+    current_rank <- wide_with_var %>%
+      filter(name == i) %>%
+      pull(rank)
     subtitle <- paste0("The name ", i, " appeared ", sum, " times in the dataset and had a variance of ", var, ".")
     p <- ggplot(data = df_with_var) +
       aes(x=`Year of Birth`, y=pct_diff, group=name) +
@@ -63,9 +76,60 @@ for (i in variance_list) {
         title = title,
         subtitle = str_wrap(subtitle, 60)
       )
-      filename <- paste0("plots/", i, ".png")
+      filename <- paste0("plots/", current_rank, "-", i, ".png")
       ggsave(filename, plot=p, width = 6, height = 4, units = "in")
 }
+
+
+for (i in variance_list) {
+  current_rank <- wide_with_var %>%
+    filter(name == i) %>%
+    pull(rank)
+  p <- ggplot(data = df_with_var) +
+    aes(x=`Year of Birth`, y=pct_diff, group=name) +
+    geom_line(color="grey50", linewidth=0.5) + 
+    geom_hline(yintercept = 0, color = "black", linewidth = 0.5) +
+    geom_line(data = filter(df_with_var, name==i), color = "red", linewidth=1) +
+    annotate("text",
+             x = 2021, y = 0.1,
+             label = "More Female ↑",
+             color = "black", size = 5,
+             fontface = "bold", alpha=0.9, hjust=1) +
+    annotate("text",
+             x = 2021, y = -0.1,
+             label = "More Male ↓",
+             color = "black", size = 5,
+             fontface = "bold", alpha=0.9, hjust=1) +
+    annotate("text",
+             x = 2011.25, y = 0.8,
+             label = i,
+             color = "grey20", size = 26,
+             fontface = "bold", alpha=0.6, hjust=0, vjust=1) +
+    labs(
+      x = "Year of Birth",
+      y = "Gender Difference"
+    ) +
+  transition_time(name) +
+  ease_aes("linear")
+  anim_save("trying-animation.gif")
+}
+
+
+imgs <- list.files(dir_out, full.names = TRUE)
+img_list <- lapply(imgs, image_read)
+
+## join the images together
+img_joined <- image_join(img_list)
+
+## animate at 2 frames per second
+img_animated <- image_animate(img_joined, fps = 2)
+
+## view animated image
+img_animated
+
+## save to disk
+image_write(image = img_animated,
+            path = "tx-sales.gif")
 
 
 df_with_var %>%
