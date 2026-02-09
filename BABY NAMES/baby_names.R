@@ -1,5 +1,7 @@
 library(tidyverse)
 library(glue)
+library(ggrepel)
+
 setwd("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES")
 
 df = read_csv("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES/Popular_Baby_Names_20260203.csv")
@@ -14,6 +16,9 @@ df_no_ethn <- df %>%
   mutate(pct_diff = (FEMALE-MALE)/(FEMALE+MALE)) %>%
   mutate(total_count = (FEMALE+MALE))
 
+df_for_calc_total_pctdiff <- df_no_ethn %>%
+  select(name, )
+
 wide_with_var <- df_no_ethn %>%
   select(name, `Year of Birth`, pct_diff) %>%
   pivot_wider(
@@ -25,7 +30,12 @@ wide_with_var <- df_no_ethn %>%
     variance = var(c_across(`2011`:`2021`), na.rm = TRUE)
   ) %>%
   ungroup() %>%
-  select(name, variance, `2011`:`2021`)
+  select(name, variance, `2011`:`2021`) %>%
+  mutate(sum_pct_diff = sum(`2011`:`2021`))
+
+## ^^ Trying to create a column summing the pct_diffs across the years so I can
+## create an animation/animated chart where it goes through each name from top to bottom
+## (like in order of highest total pct_diff to lowest total pct_diff)
 
 only_w_variance <- wide_with_var %>%
   filter(variance>0)
@@ -44,11 +54,16 @@ for (i in variance_list) {
       aes(x=`Year of Birth`, y=pct_diff, group=name) +
       geom_line(color="black", linewidth=0.5) + 
       geom_line(data = filter(df_with_var, name==i), color = "red", linewidth=1) +
+      geom_label_repel(data = filter(df_with_var, name==i),
+                      aes(label = paste0(`Year of Birth`, "\nFemale: ", FEMALE, "\nMale: ", MALE)),
+                      fill = "white",
+                      size=2,
+                      alpha=0.9) +
       labs(
         title = title,
         subtitle = str_wrap(subtitle, 60)
       )
-      filename <- paste0("plots/all_dist", i, ".png")
+      filename <- paste0("plots/", i, ".png")
       ggsave(filename, plot=p, width = 6, height = 4, units = "in")
 }
 
