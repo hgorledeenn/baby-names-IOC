@@ -6,7 +6,7 @@ An *in-one-chart* story about baby names <br>
 Created by **[Holden Green](https://www.holdengreen.me)** in February 2026 <br>
 Columbia Journalism School, Algorithms class
 
-![baby-names-gif](individual_names.gif)
+![baby-names-gif](animation/individual_names.gif)
 
 ## The Project
 
