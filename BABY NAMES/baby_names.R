@@ -1,61 +1,83 @@
+## Load necessary packages
 library(tidyverse)
 library(glue)
-library(ggplot)
 library(ggrepel)
-library(gganimate)
 
+## Set WD and read in data
 setwd("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES")
-
 df = read_csv("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES/Popular_Baby_Names_20260203.csv")
 
+## Make sure each name is formatted consistently (helps with grouping by name later)
 df <- df %>%
-  mutate(name = str_to_title(`Child's First Name`))
+  mutate(name = str_to_title(`Child's First Name`)) %>%
+  select(-`Child's First Name`)
 
-df_no_ethn <- df %>%
+## 1. Remove "ethnicity" variable and group remaining results by year, gender & name
+df_one_row_per_name_yr <- df %>%
   group_by(`Year of Birth`, Gender, name) %>%
   summarize(sum_count = sum(Count)) %>%
+## 2. Pivot wider to create only one row per name/year combo, with columns for Male and Female counts
   pivot_wider(names_from = Gender, values_from = sum_count, values_fill = 0) %>%
+## 3. Create column showing percentage difference between male and female counts
+##    (all female = 1, all male = -1)
   mutate(pct_diff = (FEMALE-MALE)/(FEMALE+MALE)) %>%
   mutate(total_count = (FEMALE+MALE))
 
-wide_with_var <- df_no_ethn %>%
+## Create a DF with only one row per name, columns for yearly pct_diff (pct_diff is NA where count=0)
+wide_with_var <- df_one_row_per_name_yr %>%
   select(name, `Year of Birth`, pct_diff) %>%
   pivot_wider(
     names_from = `Year of Birth`,
     values_from = pct_diff
   ) %>%
   rowwise() %>%
+## Add variance column showing variance in pct_diff over time
   mutate(
     variance = var(c_across(`2011`:`2021`), na.rm = TRUE)
   ) %>%
   ungroup() %>%
   select(name, variance, `2011`:`2021`)
 
+## Add sum column for measuring total of pct_diff over time per name
+##    (used for assigning ranks to order plots for animation)
 wide_with_var <- wide_with_var %>%
-  mutate(sum_pct_diff = rowSums(wide_with_var[c("2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021")], na.rm=TRUE))
-
-wide_with_var <- wide_with_var %>%
-  filter(name %in% variance_list) %>%
-  arrange(
-    desc(sum_pct_diff),   # highest total_pct_diff first
-    desc(variance),         # break ties by variance
-    name                    # break any remaining ties alphabetically
-  ) %>%
-  mutate(
-    rank = row_number()     # sequential rank
-  )
+  mutate(sum_pct_diff = rowSums(wide_with_var[c("2011","2012","2013","2014",
+                                                "2015","2016","2017","2018",
+                                                "2019","2020","2021")], na.rm=TRUE))
 
 
-
+## Create dataframe for intermediate step of creating a list of names with variance>0
 only_w_variance <- wide_with_var %>%
   filter(variance>0)
 
+## Save the list of names with variance>0 for later reference
 variance_list <- only_w_variance$name
 
-df_with_var <- df_no_ethn %>%
+
+## Filter larger dataframe to only names contained in variance_list
+wide_with_var <- wide_with_var %>%
+  filter(name %in% variance_list) %>%
+## Sort first by sum_pct_diff, higher values first
+  arrange(
+    desc(sum_pct_diff),
+## If ties exist, sort by variance, higher values first
+    desc(variance),
+## If ties exist, sort alphabetically
+    name
+  ) %>%
+  mutate(
+## Add rank as row # of sorted dataframe
+    rank = row_number()
+  )
+
+## Rather than pivoting wide_with_var to long for ggplot, I filter df_one_row_per_name_yr
+##    to only the names in variance_list
+df_with_var <- df_one_row_per_name_yr %>%
   filter(name %in% variance_list)
 
+## Making the individual plots for EXPLORATORY DATA ANALYSIS
 for (i in variance_list) {
+## 1. Define/find some variables for later
     title <- paste0("All names with variance>0 in the dataset with ", i, " highlighted")
     sum <- sum(df_with_var$total_count[df_with_var$name == i])
     var <- sum(wide_with_var$variance[wide_with_var$name == i])
@@ -63,15 +85,20 @@ for (i in variance_list) {
       filter(name == i) %>%
       pull(rank)
     subtitle <- paste0("The name ", i, " appeared ", sum, " times in the dataset and had a variance of ", var, ".")
+## 2. Make the plot
     p <- ggplot(data = df_with_var) +
       aes(x=`Year of Birth`, y=pct_diff, group=name) +
+## 3. First geom_line adds all names as black lines
       geom_line(color="black", linewidth=0.5) + 
+## 4. Second geom_line adds the particular name in a thicker red line on top
       geom_line(data = filter(df_with_var, name==i), color = "red", linewidth=1) +
+## 5. Geom_label_repel adds individual data points as text to the chart, only for the highlighted name
       geom_label_repel(data = filter(df_with_var, name==i),
                       aes(label = paste0(`Year of Birth`, "\nFemale: ", FEMALE, "\nMale: ", MALE)),
                       fill = "white",
                       size=2,
                       alpha=0.9) +
+## 6. Reference previously defined variables to add labels
       labs(
         title = title,
         subtitle = str_wrap(subtitle, 60)
@@ -80,16 +107,21 @@ for (i in variance_list) {
       ggsave(filename, plot=p, width = 6, height = 4, units = "in")
 }
 
-
+## Making individual plots for ANIMATION GRAPHIC
 for (i in variance_list) {
+## 1. Define current rank for file naming later
   current_rank <- wide_with_var %>%
     filter(name == i) %>%
     pull(rank)
   p <- ggplot(data = df_with_var) +
     aes(x=`Year of Birth`, y=pct_diff, group=name) +
-    geom_line(color="grey50", linewidth=0.5) + 
+## 2. Add all names as gray lines in the background
+    geom_line(color="grey50", linewidth=0.5) +
+## 3. Highlight the y=0 line in black to improve readability of later text annotations
     geom_hline(yintercept = 0, color = "black", linewidth = 0.5) +
+## 4. Add highlighted name as thicker red line on top
     geom_line(data = filter(df_with_var, name==i), color = "red", linewidth=1) +
+## 5. Add "More Female" and "More Male" text annotations in black to improve readability of chart
     annotate("text",
              x = 2021, y = 0.1,
              label = "More Female ↑",
@@ -100,6 +132,7 @@ for (i in variance_list) {
              label = "More Male ↓",
              color = "black", size = 5,
              fontface = "bold", alpha=0.9, hjust=1) +
+## 6. Add the highlighted name as a text annotation    
     annotate("text",
              x = 2011.25, y = 0.8,
              label = i,
@@ -108,74 +141,19 @@ for (i in variance_list) {
     labs(
       x = "Year of Birth",
       y = "Gender Difference"
-    ) +
-  transition_time(name) +
-  ease_aes("linear")
-  anim_save("trying-animation.gif")
+    )
+  filename <- paste0("for_animating/", current_rank, "-", i, ".png")
+  ggsave(filename, plot=p, width = 6, height = 4, units = "in")
 }
 
 
-imgs <- list.files(dir_out, full.names = TRUE)
-img_list <- lapply(imgs, image_read)
 
-## join the images together
-img_joined <- image_join(img_list)
-
-## animate at 2 frames per second
-img_animated <- image_animate(img_joined, fps = 2)
-
-## view animated image
-img_animated
-
-## save to disk
-image_write(image = img_animated,
-            path = "tx-sales.gif")
-
-
-df_with_var %>%
-  ggplot() +
-  aes(x=`Year of Birth`, y=pct_diff, group=name, color=name) +
-  geom_line(color="black", linewidth=0.5) + 
-  geom_line(data = filter(df_with_var, name=="Jamie"), color = "red", linewidth=1)
-
-
-df_wide_for_var <- df_no_ethn %>%
-  pivot_wider(names_from = name, values_from = pct_diff) %>%
-  select(-FEMALE, -MALE, -total_count)
-
-## Create naother df where i calculate variance for each name and filter where 
-## variance is not 0 (or is some value) then save the name column a a list and
-## then filter my original dataframe to only be that list
-
-### I HAve to pivot wide I think? So each column is a name and each row is a year.
-
-## list_of_names <- df$name_column
-
-## then
-
-##.df_other %>%
-##    filter(name==c(list_of_names)) OR SOEMTHING LIKE THAT
-
-
-df_no_yrs <- df %>%
-  mutate(name = str_to_title(`Child's First Name`)) %>%
-  group_by(Gender, name) %>%
-  summarize(sum_count = sum(Count))
-
-df_wider <- df_no_yrs %>%
-  pivot_wider(names_from = Gender, values_from = sum_count, values_fill = 0)
-
-df_only_mandf <- df_wider %>%
-  filter(FEMALE>0 & MALE>0) %>%
-  mutate(pct_diff = (FEMALE-MALE)/(FEMALE+MALE)) %>%
-  mutate(total_count = FEMALE+MALE) %>%
-  mutate(diff_size = abs(FEMALE-MALE)) %>%
-  arrange(desc(pct_diff))
-
-
+## First viz attempt (OLD)
 vertical_cols <- df_only_mandf %>%
   ggplot() +
+## 1. Order data by pct_diff
   aes(x=reorder(name, -pct_diff), y=pct_diff, fill=diff_size) +
+## 2. Add data as column chart  
   geom_col() +
   labs(
     title="% Difference in occurrences of names between females and males",
@@ -188,10 +166,13 @@ vertical_cols <- df_only_mandf %>%
     axis.text.x = element_text(size = 10, angle=270)
     )
 
+## First viz attempt (OLD)
 horizontal_bars <- df_only_mandf %>%
   ggplot() +
+## 1. Order data by pct_diff
   aes(x=reorder(name, -pct_diff), y=pct_diff, fill=diff_size) +
   geom_bar(stat="identity") +
+## 2. Flip coordinates  
   coord_flip() +
   labs(
     title = str_wrap("% Difference in occurrences of names between females and males", width=65),
@@ -204,6 +185,7 @@ horizontal_bars <- df_only_mandf %>%
     axis.text.y = element_text(size = 10, angle=0)
   )
 
+## Save two original charts
 ggsave("column_chart_1.png", 
        plot = vertical_cols, 
        width = 8, 
