@@ -21,7 +21,7 @@ After exploratory data anlysis of all the (36) names in the dataset with some va
 In this data set, the name Milan fluctuated from being only assigned to female babies in 2011 and 2012, to only assigned to male babies in 2017, and was closer to an even split at the end of the data. While some other names had 
 
 ## Data Wrangling and Visualization
-All of the data wrangling and visualization was done in R. The annotated rScript file can be found at [baby_names.R](baby_names.R).
+All of the data wrangling and visualization was done in R. The annotated rScript file can be found at [baby_names.R](baby_names.R). All of the data wrangling and visualization happened in that rScript file, and all the data for the story came from [this csv](Popular_Baby_Names_20260203.csv).
 
 I put to work a lot of concepts I'd learned from R-based classwork in undergrad and graduate classes. The clearest example of this is a for loop I create that iterates through baby names with a variance>0 in the gender divide of the name over time, and creates one plot per name highlighting that name's line. The below example is how I generated individual plots that I later put together in Photoshop to create the animation [individual_names.gif](individual_names.gif).
 
