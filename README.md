@@ -23,8 +23,9 @@ I used **[this dataset of popular baby names](https://www.ssa.gov/oact/babynames
 I was particularly interested in the topic of names that had a shift in their gender divide over time (names that were associated, over time, with both male and female babies).
 
 After exploratory data anlysis of all the names in the dataset with some variance in the gender divide of the name, I decided to focus on the name Morgan.
-
-![Morgan-gender-divide-chart](morgan.png)
+<p align="center">
+<img src="morgan.png" width=75%>
+</p>
 
 In this data set, the name Morgan fluctuated from being only assigned to male babies in the 1950s and 60s, to almost exclusively assigned to female babies in the 1990s and 2000s. Recently, it's gotten closer to a 50/50 split than its been in more than 40 years.
 
