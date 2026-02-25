@@ -95,6 +95,15 @@ for (i in years) {
 ## Survey Design
 In addition to my data analysis, I designed a short survey about living with the name Morgan and sent it to people named Morgan who I found in the Columbia University Directory. I got 12 responses (an 18% response rate) and the anonimyzed data from the survey is in [anon-survey-data.csv](anon-survey-data.csv).
 
+I found that this was an effective way to gather information about several peoples' lived experiences with the name Morgan and allowed me to, relatively quickly (at least as compared to conducting 12 individual interviews) get a range of thoughts from people named Morgan.
+
+My survey respondents spanned age, ethinc background and gender:
+
+| Oldest Respondent | Youngest Respondent | % White | % Black | % Female |
+| --- | --- | --- | --- | --- |
+| 59 Years Old | 20 Years Old | 50% | 41% |  66% |
+
+The specific questions I asked in the survey can be found in the [appendix](#appendix).
 
 ## Setbacks
 I first tried my data analysis using **[this dataset of popular baby names](https://data.cityofnewyork.us/Health/Popular-Baby-Names/25th-nujf/about_data)** from the NYC Open Data portal. I did not do enough exploratory data analysis on the dataset and, only after submitting a draft to my professor, was it pointed out that the data might have some issues.
@@ -105,3 +114,63 @@ Indeed, after I grouped by year (my original dataset only spanned 10 years) and 
 </p>
 
 Luckily, the other dataset, which I ended up using, already existed and I could somewhat easily reformat my R code to analyze my new dataset. I had originally, based on the NYC data, been interested in the name Milan and had conducted two interviews with people named Milan. These were ultimately scrapped, as the new data didn't point as strongly to Milan being an interesting name choice.
+
+## Appendix:
+
+The specific wording for my survey questions is below. The anonymized survey data can be found at (anon-survey-data.csv)[anon-survey-data.csv].
+> 1. Name of birth of respondent
+>     - “What is your name?”
+>     - [short answer response]
+> 
+> 2. Email address of respondent
+>     - ““What is your email address?”
+>     - [short answer response]
+> 
+> 3. Email address of respondent
+>     - ““What is your email address?”
+>     - [short answer response]
+> 
+> 4. Year of birth/age of respondent
+>     - “What is your birthdate?”
+>     - [short answer response]
+> 
+> 5. Gender of respondent
+>     - “What gender identity best describes you? (the data I’m analyzing only identifies male/female birth genders, but feel free to self-describe if you would prefer!)”
+>     - [multiple choice w/other option]
+>
+> 6. Home country of respondent
+>     - “Where were you born?”
+>     - [Short answer]
+>
+> 7. Ethnic background of respondent
+>     - “What is your ethnic background?”
+>     - [Long answer]
+>
+> 8. Why are they named Morgan?
+>     - “Who gave you the name Morgan and why did they > choose that name?”
+>     - [Long answer]
+>
+> 9. Have they met other people named Morgan in their lives
+>     - “Have you met other people named Morgan?”
+>     - [Yes/No]
+>
+> 10. Number of people named Morgan
+>     - “If yes, approximately how many other people named Morgan have you met in your life?”
+>     - [Short answer?]
+>
+> 11. Count of female people named Morgan they’ve met
+>     - “Approximately how many people named Morgan did you meet who were FEMALE?”
+>     - [Short answer?]
+>
+> 12. Count of male people named Morgan they’ve met
+>     - “Approximately how many people named Morgan did you meet who were MALE?”
+>     - [Short answer?]
+>
+> 13. Miscommunications with other people named Morgan
+>     - “Have you ever had a miscommunication or otherwise been confused as a result of being with another person named Morgan? (if yes, please describe)”
+>     - [Long answer]
+>
+> 14. Follow-up interview?
+>     - “Would you be comfortable with a short follow-up interview about your experiences with the name Morgan? (I will likely not reach out to everyone who says yes, and interviews could be in-person or virtually for 15 mins or less”
+>     - [Yes/No]
+> 
