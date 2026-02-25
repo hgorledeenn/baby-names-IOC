@@ -5,7 +5,7 @@ library(ggrepel)
 
 ## Set WD and read in data
 setwd("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES")
-df = read_csv("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/BABY NAMES/Popular_Baby_Names_20260203.csv")
+df = read_csv("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/Popular_Baby_Names_20260203.csv")
 
 ## Make sure each name is formatted consistently (helps with grouping by name later)
 df <- df %>%
@@ -184,6 +184,11 @@ horizontal_bars <- df_only_mandf %>%
   theme(
     axis.text.y = element_text(size = 10, angle=0)
   )
+
+df_total_year_counts <- df %>%
+  group_by(`Year of Birth`) %>%
+  summarize(sum_count = sum(Count))
+
 
 ## Save two original charts
 ggsave("column_chart_1.png", 
