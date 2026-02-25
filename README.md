@@ -1,7 +1,7 @@
 # Baby Names In-One-Chart
 
 An *in-one-chart* story about baby names <br>
-***View the full story [here](#)***
+***View the full story [here](https://hgorledeenn.github.io/baby-names-IOC/)***
 
 Created by **[Holden Green](https://hgorledeenn.github.io)** in February 2026 <br>
 Columbia Journalism School, Algorithms class
