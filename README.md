@@ -3,10 +3,17 @@
 An *in-one-chart* story about baby names <br>
 ***View the full story [here](#)***
 
-Created by **[Holden Green](https://www.holdengreen.me)** in February 2026 <br>
+Created by **[Holden Green](https://hgorledeenn.github.io)** in February 2026 <br>
 Columbia Journalism School, Algorithms class
 
 ![morgan-over-time-gif](morgan_over_time.gif)
+
+## Contents:
+1. [The Project](#the-project)
+2. [Data Wrangling and Visualization](#data-wrangling-and-visualization)
+3. [Survey Design](#survey-design)
+4. [Setbacks](#setbacks)
+
 
 ## The Project
 
@@ -86,11 +93,14 @@ for (i in years) {
 
 ```
 
-## Non-Data Sources
-In addition to my data analysis, I spoke to multiple people named Milan for my reporting.
+## Survey Design
+In addition to my data analysis, I designed a short survey about living with the name Morgan and sent it to people named Morgan who I found in the Columbia University Directory. I got 12 responses (an 18% response rate) and the anonimyzed data from the survey is in [anon-survey-data.csv](anon-survey-data.csv).
 
 
-<br><br><br><br><br><br>
+## Setbacks
+I first tried my data analysis using **[this dataset of popular baby names](https://data.cityofnewyork.us/Health/Popular-Baby-Names/25th-nujf/about_data)** from the NYC Open Data portal. I did not do enough exploratory data analysis on the dataset and, only after submitting a draft to my professor, was it pointed out that the data might have some issues.
 
-
-I used **[this dataset of popular baby names](https://data.cityofnewyork.us/Health/Popular-Baby-Names/25th-nujf/about_data)** from the NYC Open Data portal, then came up with the idea for the story.
+Indeed, the 
+<p align="center">
+<img src="old-data-year-count.png" width=50%>
+</p>
