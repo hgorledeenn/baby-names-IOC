@@ -6,65 +6,91 @@ An *in-one-chart* story about baby names <br>
 Created by **[Holden Green](https://www.holdengreen.me)** in February 2026 <br>
 Columbia Journalism School, Algorithms class
 
-![baby-names-gif](animation/individual_names.gif)
+![morgan-over-time-gif](morgan_over_time.gif)
 
 ## The Project
 
-I first came across **[this dataset of popular baby names](https://data.cityofnewyork.us/Health/Popular-Baby-Names/25th-nujf/about_data)** from the NYC Open Data portal, then came up with the idea for the story.
+I used **[this dataset of popular baby names](https://www.ssa.gov/oact/babynames/limits.html)** from the Social Security Administration.
 
 I was particularly interested in the topic of names that had a shift in their gender divide over time (names that were associated, over time, with both male and female babies).
 
-After exploratory data anlysis of all the (36) names in the dataset with some variance in the gender divide of the name, I decided to focus on the name Milan.
+After exploratory data anlysis of all the names in the dataset with some variance in the gender divide of the name, I decided to focus on the name Morgan.
 
-![Milan-gender-divide-chart](plots/19-Milan.png)
+![Morgan-gender-divide-chart](morgan.png)
 
-In this data set, the name Milan fluctuated from being only assigned to female babies in 2011 and 2012, to only assigned to male babies in 2017, and was closer to an even split at the end of the data. While some other names had 
+In this data set, the name Morgan fluctuated from being only assigned to male babies in the 1950s and 60s, to almost exclusively assigned to female babies in the 1990s and 2000s. Recently, it's gotten closer to a 50/50 split than its been in more than 40 years.
 
 ## Data Wrangling and Visualization
-All of the data wrangling and visualization was done in R. The annotated rScript file can be found at [baby_names.R](baby_names.R). All of the data wrangling and visualization happened in that rScript file, and all the data for the story came from [this csv](Popular_Baby_Names_20260203.csv).
+All of the data wrangling and visualization was done in R. The annotated rScript file can be found at [baby_names_2.R](baby_names_2.R). All of the data wrangling and visualization happened in that rScript file, and all the data for the story came from [this .txt file](/namesbystate/NY.TXT).
 
-I put to work a lot of concepts I'd learned from R-based classwork in undergrad and graduate classes. The clearest example of this is a for loop I create that iterates through baby names with a variance>0 in the gender divide of the name over time, and creates one plot per name highlighting that name's line. The below example is how I generated individual plots that I later put together in Photoshop to create the animation [individual_names.gif](individual_names.gif).
+I put to work a lot of concepts I'd learned from R-based classwork in undergrad and graduate classes. The clearest example of this is a for loop I created that iterates through each year of data for the gender divide of the name Morgan and creates one plot per new year. The below example is how I generated individual plots that I later put together in Photoshop to create the animation at the top of this file [morgan_over_time.gif](morgan_over_time.gif).
 
 ```R
-for (i in variance_list) {
-## 1. Define current rank for file naming later
-  current_rank <- wide_with_var %>%
-    filter(name == i) %>%
-    pull(rank)
-  p <- ggplot(data = df_with_var) +
-    aes(x=`Year of Birth`, y=pct_diff, group=name) +
-## 2. Add all names as gray lines in the background
-    geom_line(color="grey50", linewidth=0.5) +
-## 3. Highlight the y=0 line in black to improve readability of later text annotations
-    geom_hline(yintercept = 0, color = "black", linewidth = 0.5) +
-## 4. Add highlighted name as thicker red line on top
-    geom_line(data = filter(df_with_var, name==i), color = "red", linewidth=1) +
-## 5. Add "More Female" and "More Male" text annotations in black to improve readability of chart
+years = c(1950:2024)
+
+for (i in years) {
+  p <- ggplot(data = filter(only_morgan, year<=i)) +
     annotate("text",
-             x = 2021, y = 0.1,
-             label = "More Female ↑",
-             color = "black", size = 5,
-             fontface = "bold", alpha=0.9, hjust=1) +
-    annotate("text",
-             x = 2021, y = -0.1,
-             label = "More Male ↓",
-             color = "black", size = 5,
-             fontface = "bold", alpha=0.9, hjust=1) +
-## 6. Add the highlighted name as a text annotation    
-    annotate("text",
-             x = 2011.25, y = 0.8,
+             x = 1950, y = 0.95,
              label = i,
              color = "grey20", size = 26,
              fontface = "bold", alpha=0.6, hjust=0, vjust=1) +
-    labs(
-      x = "Year of Birth",
-      y = "Gender Difference"
-    )
-  filename <- paste0("for_animating/", current_rank, "-", i, ".png")
-  ggsave(filename, plot=p, width = 6, height = 4, units = "in")
+  aes(x=year, y=real_pct_diff, color = bigger_share) +
+  geom_line(color="black", size=0.5, alpha=0.5) +
+  geom_point(size=2) +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_hline(yintercept = 0.25, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "black", linewidth = 0.5, alpha = 0.75) +
+  geom_hline(yintercept = 0.75, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_hline(yintercept = 1, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_vline(xintercept = 1950, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_vline(xintercept = 1965, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_vline(xintercept = 1980, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_vline(xintercept = 1995, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_vline(xintercept = 2010, color = "black", linewidth = 0.25, alpha = 0.25) +
+  geom_vline(xintercept = 2025, color = "black", linewidth = 0.25, alpha = 0.25) +
+  scale_y_continuous(breaks = c(0, .25, .5, .75, 1),
+                     limits = c(0, 1),
+                     labels = scales::label_percent(scale = 100)) +
+  scale_x_continuous(breaks = c(1950, 1965, 1980, 1995, 2010, 2025)) +
+  scale_color_manual(values = c("Female" = "hotpink", "Male" = "dodgerblue")) +
+  annotate("text",
+           x = 2025, y = 0.53,
+           label = "More Female ↑",
+           color = "black", size = 4,
+           fontface = "bold", alpha=.75, hjust=1) +
+  annotate("text",
+           x = 2025, y = 0.47,
+           label = "More Male ↓",
+           color = "black", size = 4,
+           fontface = "bold", alpha=.75, hjust=1) +
+  labs(
+    title = "The name 'Morgan' might be past its mostly-female peak",
+    subtitle = "Share of babies named Morgan who were female from 1950-2024",
+    x = "Year of Birth",
+    y = "Percent Female",
+    color = "Majority Gender",
+    caption = "Created by Holden Green | Data source: SSA Baby Names"
+  ) +
+  theme_test() +
+  theme(legend.position = "top",
+        legend.justification = "left",
+        legend.background = element_rect(color="gray15", linetype="solid", linewidth = 0.25),
+        legend.margin = margin(3,5,3,5),
+        legend.title = element_text(size=7),
+        legend.text = element_text(size=7),
+        legend.key.size = unit(0.75,"line")) +
+    guides(color=guide_legend(override.aes = list(size=2)))
+  ggsave(paste0("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/year_plots_morgan/", i, ".png"), plot=p, width = 6, height = 5, units = "in")
 }
+
 ```
 
 ## Non-Data Sources
 In addition to my data analysis, I spoke to multiple people named Milan for my reporting.
 
+
+<br><br><br><br><br><br>
+
+
+I used **[this dataset of popular baby names](https://data.cityofnewyork.us/Health/Popular-Baby-Names/25th-nujf/about_data)** from the NYC Open Data portal, then came up with the idea for the story.
