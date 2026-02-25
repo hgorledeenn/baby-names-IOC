@@ -90,7 +90,6 @@ for (i in years) {
     guides(color=guide_legend(override.aes = list(size=2)))
   ggsave(paste0("~/Desktop/CJS/0126algorithms/HW-in-one-chart-1/year_plots_morgan/", i, ".png"), plot=p, width = 6, height = 5, units = "in")
 }
-
 ```
 
 ## Survey Design
@@ -100,7 +99,9 @@ In addition to my data analysis, I designed a short survey about living with the
 ## Setbacks
 I first tried my data analysis using **[this dataset of popular baby names](https://data.cityofnewyork.us/Health/Popular-Baby-Names/25th-nujf/about_data)** from the NYC Open Data portal. I did not do enough exploratory data analysis on the dataset and, only after submitting a draft to my professor, was it pointed out that the data might have some issues.
 
-Indeed, the 
+Indeed, after I grouped by year (my original dataset only spanned 10 years) and summed the counts of each baby name, I found that the first 4 years had roughly 550,000 baby names reported each year. In the other years, the total per year is roughly 10% of that, with about 60,000 babies reported each year.
 <p align="center">
-<img src="old-data-year-count.png" width=50%>
+<img src="old-data-year-count.png" width=40%>
 </p>
+
+Luckily, the other dataset, which I ended up using, already existed and I could somewhat easily reformat my R code to analyze my new dataset. I had originally, based on the NYC data, been interested in the name Milan and had conducted two interviews with people named Milan. These were ultimately scrapped, as the new data didn't point as strongly to Milan being an interesting name choice.
