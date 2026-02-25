@@ -13,6 +13,7 @@ Columbia Journalism School, Algorithms class
 2. [Data Wrangling and Visualization](#data-wrangling-and-visualization)
 3. [Survey Design](#survey-design)
 4. [Setbacks](#setbacks)
+5. [Appendix](#appendix)
 
 
 ## The Project
@@ -93,7 +94,9 @@ for (i in years) {
 ```
 
 ## Survey Design
-In addition to my data analysis, I designed a short survey about living with the name Morgan and sent it to people named Morgan who I found in the Columbia University Directory. I got 12 responses (an 18% response rate) and the anonimyzed data from the survey is in [anon-survey-data.csv](anon-survey-data.csv).
+In addition to my data analysis, I designed a short survey about living with the name Morgan and sent it to people named Morgan who I found in the Columbia University Directory. I got 12 responses (an 18% response rate) and the anonimyzed data from the survey is in [anon-survey-data.csv](anon-survey-data.csv). 
+
+*The specific questions I asked in the survey can be found in the [appendix](#appendix).*
 
 I found that this was an effective way to gather information about several peoples' lived experiences with the name Morgan and allowed me to, relatively quickly (at least as compared to conducting 12 individual interviews) get a range of thoughts from people named Morgan.
 
@@ -102,8 +105,6 @@ My survey respondents spanned age, ethinc background and gender:
 | Oldest Respondent | Youngest Respondent | % White | % Black | % Female |
 | --- | --- | --- | --- | --- |
 | 59 Years Old | 20 Years Old | 50% | 41% |  66% |
-
-The specific questions I asked in the survey can be found in the [appendix](#appendix).
 
 ## Setbacks
 I first tried my data analysis using **[this dataset of popular baby names](https://data.cityofnewyork.us/Health/Popular-Baby-Names/25th-nujf/about_data)** from the NYC Open Data portal. I did not do enough exploratory data analysis on the dataset and, only after submitting a draft to my professor, was it pointed out that the data might have some issues.
@@ -117,7 +118,7 @@ Luckily, the other dataset, which I ended up using, already existed and I could 
 
 ## Appendix:
 
-The specific wording for my survey questions is below. The anonymized survey data can be found at (anon-survey-data.csv)[anon-survey-data.csv].
+The specific wording for my survey questions is below. The anonymized survey data can be found at [anon-survey-data.csv](anon-survey-data.csv).
 > 1. Name of birth of respondent
 >     - “What is your name?”
 >     - [short answer response]
